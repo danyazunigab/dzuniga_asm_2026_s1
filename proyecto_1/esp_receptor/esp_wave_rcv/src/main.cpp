@@ -92,7 +92,7 @@ bool readExact(uint8_t *buf, size_t len, uint32_t timeoutMs = 300)
     return true;
 }
 
-// Espera los bytes de sync 0x5A 0xA5 (= uint16_t 0xA55A en little-endian)
+// Espera los bytes de sync 0x5A 0xA5 (= uint16_t 0xA55A usando little-endian)
 bool waitSync(uint32_t timeoutMs = 1000)
 {
     uint8_t prev = 0, cur = 0;
@@ -196,12 +196,31 @@ void processAndBuffer()
 }
 
 // ---- Setup & Loop --------------------------------------------------------
+static uint32_t lastGoodPacketMs = 0;
+const  uint32_t SILENCE_AFTER_MS = 500;  // sin datos → silencio
+
+// Manda silencio al buffer de fill y señala swap
+void sendSilence() {
+    memset(audioBuf[fillBuf], 0, BUF_FRAMES * sizeof(int16_t));
+    newFrame = true;
+}
+
 void setup()
 {
     Serial.begin(115200);
+    /*
+    velocidad = UART_BAUD: 921600 
+    formato = 8N1
+     - 8 bits de datos
+     - no paridad
+     - 1 bit de stop
+    TX = GPIO17
+    RX = GPIO16
+    */
+
     Serial2.begin(UART2_BAUD, SERIAL_8N1, 16, 17);
 
-    memset(audioBuf, 0, sizeof(audioBuf)); // silencio inicial
+    memset(audioBuf, 0, sizeof(audioBuf));
 
     a2dp.start(BT_DEVICE_NAME, provideFrames);
 
@@ -210,20 +229,20 @@ void setup()
 
 void loop()
 {
-    if (!waitSync())
-    {
-        Serial.println("timeout esperando sync UART");
+    if (!waitSync(300)) {
+        if (millis() - lastGoodPacketMs > SILENCE_AFTER_MS) sendSilence();
         return;
     }
 
     PacketHeader hdr;
     uint16_t numBins;
-    if (!receivePacket(hdr, numBins))
-    {
+    if (!receivePacket(hdr, numBins)) {
         Serial.println("paquete invalido");
+        if (millis() - lastGoodPacketMs > SILENCE_AFTER_MS) sendSilence();
         return;
     }
 
+    lastGoodPacketMs = millis();
     buildSpectrum(numBins);
     processAndBuffer();
 

@@ -134,15 +134,15 @@ def snr_db(x_orig, x_rec):
 #  3.  Generación de Señales
 # ─────────────────────────────────────────────
 
-def señal_senoidal(freq=440.0, fs=4000, duracion=0.5, amplitud=1.0):
+def señal_senoidal(freq=440.0, fs=2000, duracion=0.5, amplitud=1.0):
     n = np.arange(int(fs * duracion))
     return amplitud * np.sin(2 * np.pi * freq * n / fs)
 
-def señal_suma_senoidales(freqs, amplitudes, fs=4000, duracion=0.5):
+def señal_suma_senoidales(freqs, amplitudes, fs=2000, duracion=0.5):
     n = np.arange(int(fs * duracion))
     return sum(A * np.sin(2 * np.pi * f * n / fs) for f, A in zip(freqs, amplitudes))
 
-def señal_cuadrada(freq=440.0, fs=4000, duracion=0.5, amplitud=1.0):
+def señal_cuadrada(freq=440.0, fs=2000, duracion=0.5, amplitud=1.0):
     """Onda cuadrada como suma de armónicos impares: (4A/πk)·sin(2πkft)"""
     n = np.arange(int(fs * duracion))
     s = np.zeros(len(n))
@@ -526,19 +526,19 @@ def main():
 
     if op == '1':
         f = float(input("  Frecuencia (Hz) [440]: ").strip() or "440")
-        rs.append(comprimir_señal(señal_senoidal(f), 4000, fra, f"senoidal_{int(f)}Hz"))
+        rs.append(comprimir_señal(señal_senoidal(f), 2000, fra, f"senoidal_{int(f)}Hz"))
 
     elif op == '2':
         rs.append(comprimir_señal(
             señal_suma_senoidales([261, 329, 392, 523, 659], [1.0, 0.8, 0.9, 0.4, 0.3]),
-            4000, fra, "acorde_doMiSol"))
+            2000, fra, "acorde_doMiSol"))
 
     elif op == '3':
         f = float(input("  Frecuencia fundamental (Hz) [220]: ").strip() or "220")
-        rs.append(comprimir_señal(señal_cuadrada(f), 4000, fra, f"cuadrada_{int(f)}Hz"))
+        rs.append(comprimir_señal(señal_cuadrada(f), 2000, fra, f"cuadrada_{int(f)}Hz"))
 
     elif op == '4':
-        rs.append(comprimir_señal(señal_ruido_blanco(4096), 4000, fra, "ruido_blanco"))
+        rs.append(comprimir_señal(señal_ruido_blanco(4096), 2000, fra, "ruido_blanco"))
 
     elif op == '5':
         ruta = input("  Ruta al .wav: ").strip()
@@ -555,12 +555,12 @@ def main():
 
     elif op == '6':
         for nombre, señal, fs in [
-            ("senoidal_440Hz",   señal_senoidal(250),                                   4000),
+            ("senoidal_440Hz",   señal_senoidal(250),                                   2000),
             ("acorde_doMiSol",   señal_suma_senoidales([261, 329, 392, 523, 659],
-                                                        [1.0, 0.8, 0.9, 0.4, 0.3]),    4000),
-            ("cuadrada_220Hz",   señal_cuadrada(250),                                   4000),
-            ("chirp_100_2000Hz", señal_chirp(),                                         4000),
-            ("ruido_blanco",     señal_ruido_blanco(4096),                              4000),
+                                                        [1.0, 0.8, 0.9, 0.4, 0.3]),    2000),
+            ("cuadrada_220Hz",   señal_cuadrada(250),                                   2000),
+            ("chirp_100_2000Hz", señal_chirp(),                                         2000),
+            ("ruido_blanco",     señal_ruido_blanco(4096),                              2000),
         ]:
             rs.append(comprimir_señal(señal, fs, fra, nombre))
     else:

@@ -26,7 +26,7 @@ enum WaveMode
     NOISE
 };
 WaveMode currentMode = SINE;
-const char *modeNames[] = {"SENOIDAL 250Hz", "CUADRADA (Sum)", "SUMA (Acorde Do Mayor)", "RUIDO BLANCO"};
+const char *modeNames[] = {"SENOIDAL 250Hz", "CUADRADA (Sum)", "SUMA (La menor 7)", "RUIDO BLANCO"};
 
 void buildWaveTable(WaveMode mode)
 {
@@ -54,20 +54,20 @@ void buildWaveTable(WaveMode mode)
                     break;
                 val += (4.0f / (PI * k)) * sinf(2.0f * PI * (k * 32) * t_norm);
             }
-            val /= 1.27f; // Normalización específica para Gibbs/Square
+            val /= 1.27f;
             break;
 
-        case SUM: // Reemplazado con tu acorde: [C4, E4, G4, C5, E5]
+        case SUM:
         {
-            float f[] = {261.0f, 329.0f, 392.0f, 523.0f, 659.0f};
-            float a[] = {1.0f, 0.8f, 0.9f, 0.4f, 0.3f};
-            float suma_amps = 3.4f; // 1.0+0.8+0.9+0.4+0.3
+            float f[] = {220.0f, 261.63f, 329.63f, 392.00f, 440.00f};
+            float a[] = {1.0f, 0.7f, 0.6f, 0.5f, 0.4f};
+            float suma_amps = 3.2f;
 
             for (int j = 0; j < 5; j++)
             {
                 val += a[j] * sinf(2.0f * PI * f[j] * t_seg);
             }
-            val /= suma_amps; // Normalizamos para que el pico máximo sea 1.0
+            val /= suma_amps;
         }
         break;
 
@@ -76,8 +76,6 @@ void buildWaveTable(WaveMode mode)
             break;
         }
 
-        // Escalado final para el DAC (0-255)
-        // val ya viene normalizado entre -1.0 y 1.0 desde el switch
         sineTable[i] = (uint8_t)((val + 1.0f) * 127.5f);
     }
     Serial.printf("Modo Activo: %s\n", modeNames[mode]);

@@ -134,15 +134,15 @@ def snr_db(x_orig, x_rec):
 #  3.  Generación de Señales
 # ─────────────────────────────────────────────
 
-def señal_senoidal(freq=440.0, fs=2000, duracion=0.5, amplitud=1.0):
+def señal_senoidal(freq=440.0, fs=2000, duracion=2.5, amplitud=1.0):
     n = np.arange(int(fs * duracion))
     return amplitud * np.sin(2 * np.pi * freq * n / fs)
 
-def señal_suma_senoidales(freqs, amplitudes, fs=2000, duracion=0.5):
+def señal_suma_senoidales(freqs, amplitudes, fs=2000, duracion=2.5):
     n = np.arange(int(fs * duracion))
     return sum(A * np.sin(2 * np.pi * f * n / fs) for f, A in zip(freqs, amplitudes))
 
-def señal_cuadrada(freq=440.0, fs=2000, duracion=0.5, amplitud=1.0):
+def señal_cuadrada(freq=440.0, fs=2000, duracion=2.5, amplitud=1.0):
     """Onda cuadrada como suma de armónicos impares: (4A/πk)·sin(2πkft)"""
     n = np.arange(int(fs * duracion))
     s = np.zeros(len(n))
@@ -507,7 +507,7 @@ def main():
     print("="*60)
     print("\n  Fuente de la señal:")
     print("   1. Sinusoide pura")
-    print("   2. Suma de sinusoides (acorde do-mi-sol)")
+    print("   2. Suma de sinusoides (acorde La menor 7)")
     print("   3. Onda cuadrada (armónicos impares)")
     print("   4. Ruido blanco (peor caso para compresión espectral)")
     print("   5. Archivo .wav propio")
@@ -530,7 +530,7 @@ def main():
 
     elif op == '2':
         rs.append(comprimir_señal(
-            señal_suma_senoidales([261, 329, 392, 523, 659], [1.0, 0.8, 0.9, 0.4, 0.3]),
+            señal_suma_senoidales([220, 261.63, 329.63, 392, 440], [1.0, 0.7, 0.6, 0.5, 0.4]),
             2000, fra, "acorde_doMiSol"))
 
     elif op == '3':

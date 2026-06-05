@@ -14,24 +14,24 @@ long setpoint = PISO1;
 
 // Home
 
-#define HOME_SWITCH 6
+#define HOME_SWITCH 12
 
 // L298N
 
 #define ENA 5
-#define IN1 7
-#define IN2 8
+#define IN1 6
+#define IN2 7
 
 // Botones
 
-#define BTN1 2
-#define BTN2 3
-#define BTN3 4
+#define BTN1 8
+#define BTN2 9
+#define BTN3 10
 
 // Encoder
 
-#define ENCODER_A 18
-#define ENCODER_B 19
+#define ENCODER_A 2
+#define ENCODER_B 3
 
 float Kp = 0.10;
 float Ki = 0.0005;
